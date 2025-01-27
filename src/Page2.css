@@ -1,0 +1,34 @@
+  .participants {
+    text-align: center;
+  }
+  
+  .avatars {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    /* margin-top: 40px; */
+    margin-bottom: 10px;
+  }
+  .avatar {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    margin: 0 5px;
+    margin-left: -15px;  
+  }
+  
+  .extra {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background-color: #dcdcdc;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    margin-left: -20px;
+  }
+  
+  .textP{
+    margin-left: 5px;
+  }
