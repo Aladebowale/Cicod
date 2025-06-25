@@ -18,11 +18,12 @@ import AxiosCicod from "./Componenets/CicodAxios"
 // import AxiosSD from "./Componenets/AxiosPreD"
 import WebSocketComponent from "./Componenets/AxiosWBs"
 import WebSocketIntegration from "./Componenets/check"
-// import VWebinar from "./Componenets/Edit"
+import EWeb from "./Componenets/Edit"
 
 
 // import WebSocketComponent from "./Componenets/WBs"
 import VWeb from "./Componenets/VWeb"
+
 
 
 const App = () => {
@@ -47,6 +48,9 @@ const App = () => {
 
           <Route path='/WBs' element={<WebSocketComponent/>}/>
           <Route path='/VWeb' element={<VWeb/>}/>
+
+          <Route path='/EWeb' element={<EWeb/>}/>
+
           {/* <Route path='/VWebinar' element={<VWebinar/>}/> */}
          </Routes>
        </Router> 
