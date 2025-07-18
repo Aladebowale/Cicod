@@ -18,6 +18,8 @@ import axios from "axios";
 import Audio from "./AudioWebsocket";
 import { useLocation } from 'react-router-dom';
 
+
+
 let ws = null;
 
 const Room1 = () => {
@@ -31,6 +33,9 @@ const Room1 = () => {
   const [hostVideo, setHostVideo] = useState(false);
   const videoRef = useRef(null);
   const location = useLocation();
+  const [connectAudio, setConnectAudio] = useState(false);
+
+  
 
 
 
@@ -215,6 +220,112 @@ const Room1 = () => {
       sendWSMessage(subMsg7);
       const subMsg8 = `{"msg":"sub","id":"${generateRandomId(17)}","name":"video-streams","params":[]}`;
       sendWSMessage(subMsg8);
+      const subMsg9 = `{"msg":"sub","id":"${generateRandomId(
+        17
+      )}","name":"presentation","params":[]}`;
+      sendWSMessage(subMsg9);
+      const subMsg10 = `{"msg":"sub","id":"${generateRandomId(
+        17
+      )}","name":"slides","params":[]}`;
+      sendWSMessage(subMsg10);
+      const subMsg11 = `{"msg":"sub","id":"${generateRandomId(
+        17
+      )}","name":"slide-positions","params":[]}`;
+      sendWSMessage(subMsg11);
+      const subMsg12 = `{"msg":"sub","id":"${generateRandomId(
+        17
+      )}","name":"captions","params":[]}`;
+      sendWSMessage(subMsg12);
+      const subMsg13 = `{"msg":"sub","id":"${generateRandomId(
+        17
+      )}","name":"voiceUsers","params":[]}`;
+      sendWSMessage(subMsg13);
+      const subMsg14 = `{"msg":"sub","id":"${generateRandomId(
+        17
+      )}","name":"whiteboard-multi-user","params":[]}`;
+      sendWSMessage(subMsg14);
+      const subMsg15 = `{"msg":"sub","id":"${generateRandomId(
+        17
+      )}","name":"screenshare","params":[]}`;
+      sendWSMessage(subMsg15);
+      const subMsg16 = `{"msg":"sub","id":"${generateRandomId(
+        17
+      )}","name":"group-chat","params":[]}`;
+      sendWSMessage(subMsg16);
+      const subMsg17 = `{"msg":"sub","id":"${generateRandomId(
+        17
+      )}","name":"group-chat-msg","params":[]}`;
+      sendWSMessage(subMsg17);
+      const subMsg18 = `{"msg":"sub","id":"${generateRandomId(
+        17
+      )}","name":"presentation-pods","params":[]}`;
+      sendWSMessage(subMsg18);
+      const subMsg19 = `{"msg":"sub","id":"${generateRandomId(
+        17
+      )}","name":"users-settings","params":[]}`;
+      sendWSMessage(subMsg19);
+      const subMsg20 = `{"msg":"sub","id":"${generateRandomId(
+        17
+      )}","name":"users-infos","params":[]}`;
+      sendWSMessage(subMsg20);
+      const subMsg21 = `{"msg":"sub","id":"${generateRandomId(
+        17
+      )}","name":"note","params":[]}`;
+      sendWSMessage(subMsg21);
+      const subMsg22 = `{"msg":"sub","id":"${generateRandomId(
+        17
+      )}","name":"meeting-time-remaining","params":[]}`;
+      sendWSMessage(subMsg22);
+      const subMsg23 = `{"msg":"sub","id":"${generateRandomId(
+        17
+      )}","name":"local-settings","params":[]}`;
+      sendWSMessage(subMsg23);
+      const subMsg24 = `{"msg":"sub","id":"${generateRandomId(
+        17
+      )}","name":"users-typing","params":[]}`;
+      sendWSMessage(subMsg24);
+      const subMsg25 = `{"msg":"sub","id":"${generateRandomId(
+        17
+      )}","name":"record-meetings","params":[]}`;
+      sendWSMessage(subMsg25);
+      const subMsg26 = `{"msg":"sub","id":"${generateRandomId(
+        17
+      )}","name":"video-streams","params":[]}`;
+      sendWSMessage(subMsg26);
+      const subMsg27 = `{"msg":"sub","id":"${generateRandomId(
+        17
+      )}","name":"connection-status","params":[]}`;
+      sendWSMessage(subMsg27);
+      const subMsg28 = `{"msg":"sub","id":"${generateRandomId(
+        17
+      )}","name":"voice-call-status","params":[]}`;
+      sendWSMessage(subMsg28);
+      const subMsg29 = `{"msg":"sub","id":"${generateRandomId(
+        17
+      )}","name":"external-video-meetings","params":[]}`;
+      sendWSMessage(subMsg29);
+      const subMsg30 = `{"msg":"sub","id":"${generateRandomId(
+        17
+      )}","name":"meetings","params":["MODERATOR"]}`;
+      sendWSMessage(subMsg30);
+      const subMsg31 = `{"msg":"sub","id":"${generateRandomId(
+        17
+      )}","name":"users","params":["MODERATOR"]}`;
+      sendWSMessage(subMsg31);
+      const subMsg32 = `{"msg":"sub","id":"${generateRandomId(
+        17
+      )}","name":"breakouts","params":["MODERATOR"]}`;
+      sendWSMessage(subMsg32);
+      const subMsg33 = `{"msg":"sub","id":"${generateRandomId(
+        17
+      )}","name":"guestUsers","params":["MODERATOR"]}`;
+      sendWSMessage(subMsg33);
+      const subMsg34 = `{"msg":"sub","id":"${generateRandomId(
+        17
+      )}","name":"annotations","params":[]}`;
+      sendWSMessage(subMsg34);
+      const subMsg35 = `{"msg":"method","id":"100","method":"userShareWebcam","params":["${buildStreamName(userCamera.deviceID)}"]}`;
+      sendWSMessage(subMsg35);
     };
 
     ws.onmessage = (event) => {
@@ -227,6 +338,7 @@ const Room1 = () => {
         setError(`WebSocket error: ${data.reason}`);
       }
       if (data.msg === "added" && data.collection === "users") {
+        setConnectAudio(true)
         setParticipants((prev) => [
           ...prev,
           {
@@ -288,6 +400,7 @@ const Room1 = () => {
   return (
     <div className="h-screen bg-gray-100 flex flex-col w-800">
       <Header />
+      {connectAudio && <Audio sessionToken={location.state?.meeting.data}/>}
       <main className="flex-grow flex flex-col items-center justify-center p-6 h-screen">
         <div className="bg-white rounded-lg shadow-lg w-1/2 h-96">
           <div className="relative">

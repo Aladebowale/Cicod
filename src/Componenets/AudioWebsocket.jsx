@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import kurentoUtils from "kurento-utils";
 
-const Audio = () => {
+const Audio = ({ sessionToken }) => {
   const ws = useRef(null);
   const webRtcPeer = useRef(null);
   const [connected, setConnected] = useState(false);
@@ -10,7 +10,7 @@ const Audio = () => {
   const start = () => {
     if (!ws.current || ws.current.readyState === WebSocket.CLOSED) {
       ws.current = new WebSocket(
-        `wss://meet.konn3ct.ng/bbb-webrtc-sfu?sessionToken=${user.sessionToken}`
+        `wss://meet.konn3ct.ng/bbb-webrtc-sfu?sessionToken=${sessionToken}`
       );
 
       ws.current.onopen = () => {
