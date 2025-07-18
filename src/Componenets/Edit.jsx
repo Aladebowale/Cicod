@@ -31,6 +31,7 @@ import mic from "../Images/Icon/Mic.png";
 import hand from "../Images/Icon/hand.png";
 import recordIcon from "../Images/Icon/recordIcon.png";
 import axios from "axios";
+import Audio from "./AudioWebsocket"
 
 let ws = null;
 
@@ -90,8 +91,8 @@ const EWeb = () => {
   const fetchUserData = async () => {
     try {
       const payload = {
-        room: "Ade1253uL",
-        name: "Wale Pung",
+        room: "standupmeet",
+        name: "Lukman",
         email: "w.aladebowale@gmail.com",
         access_code: "",
       };
@@ -101,7 +102,7 @@ const EWeb = () => {
       const res = await axios.post(url, payload, { headers });
       const sessionToken = res.data.data;
       const response = await axios.get(
-        `https://meet.konn3ct.ng/bigbluebutton/api/enter?sessionToken=${sessionToken}`
+        `https://meet.konn3ct.ng/bigbluebutton/api/enter?sessionToken=${user.sessionToken}`
       );
 
       if (response.data?.response?.returncode === "FAILED") {
@@ -114,6 +115,7 @@ const EWeb = () => {
       console.log("Connect User:", response.data);
       const userData = response.data.response;
       userData.name = userData.fullname || userData.name || "Guest";
+      userData.sessionToken = sessionToken;
       setUser(userData);
       console.log("User data:", userData);
     } catch (err) {
@@ -251,13 +253,14 @@ const EWeb = () => {
     );
 
     ws.onopen = () => {
-      console.log("WebSocket connected");
+      console.log("WebSocket connected to SFU");
       setSocket(ws);
 
       console.log("meetingID:", user.meetingID);
       console.log("internalUserID:", user.internalUserID);
       console.log("authToken:", user.authToken);
       console.log("externUserID:", user.externUserID);
+      console.log("")
 
       const subMsg1 = `{"msg":"connect","version":"1","support":["1","pre2","pre1"]}`;
       sendWSMessage(subMsg1);
@@ -391,8 +394,9 @@ const EWeb = () => {
         17
       )}","name":"annotations","params":[]}`;
       sendWSMessage(subMsg34);
+      const subMsg35 = `{"msg":"method","id":"100","method":"userShareWebcam","params":["${buildStreamName(userCamera.deviceID)}"]}`;
+      sendWSMessage(subMsg35);
     };
-
     ws.onmessage = (event) => {
       console.log("Raw WebSocket message:", event.data);
       let data = event.data;
@@ -454,7 +458,26 @@ const EWeb = () => {
         console.log("User left:", data.id);
         setParticipants((prev) => prev.filter((p) => p.id !== data.id));
       }
-      
+      if (data.msg === "signal" && data.method) {
+        const pc = participants.find((p) => p.id === data.params[0])?.peerConnection;
+        if (pc) {
+          if (data.method === "offer") {
+            const offer = new RTCSessionDescription(data.params[1]);
+            pc.setRemoteDescription(offer).then(() => {
+              pc.createAnswer().then((answer) => {
+                pc.setLocalDescription(answer);
+                sendWSMessage({
+                  msg: "method",
+                  method: "answer",
+                  params: [data.params[0], JSON.stringify(answer)],
+                });
+              });
+            });
+          } else if (data.method === "candidate") {
+            pc.addIceCandidate(new RTCIceCandidate(JSON.parse(data.params[1])));
+          }
+        }
+      }
       if (chatContainerRef.current) {
         chatContainerRef.current.scrollTop =
           chatContainerRef.current.scrollHeight;
@@ -653,6 +676,7 @@ const EWeb = () => {
               </div>
             )}
           </div>
+          
           <button className="bg-[#E8F2EE] text-[#1E6132] px-3 py-1 rounded-lg text-sm font-medium">
             Code: cem-jmnt-hsu
           </button>
@@ -675,12 +699,14 @@ const EWeb = () => {
               muted={user?.id === participants.find((p) => p.name === user?.name)?.id}
               className="absolute top-0 left-0 w-full h-full rounded-xl object-cover"
             />
-            <audio autoPlay muted={user?.id === participants.find((p) => p.name === user?.name)?.id}>
+             <Audio hostAudio={hostAudio} />
+            {/* <audio autoPlay muted={user?.id === participants.find((p) => p.name === user?.name)?.id}>
               {localStream && <source srcObject={localStream} type="audio/webm" />}
               {participants.map((p) => p.audioStream && (
                 <source key={p.id} srcObject={p.audioStream} type="audio/webm" />
-              ))}
-            </audio>
+              ))} */}
+            {/* </audio> */}
+            
             {participants.map((p) =>
               p.videoStream && (
                 <video
@@ -691,6 +717,7 @@ const EWeb = () => {
                 />
               )
             )}
+            
             <div className="absolute top-3 left-3 flex items-center space-x-2 border border-gray-300 rounded-lg px-3 py-1 shadow-sm bg-white">
               <div className="relative w-5 h-5 flex items-center justify-center">
                 <div className="absolute w-full h-full border-2 border-red-500 opacity-50 rounded-full animate-ping"></div>

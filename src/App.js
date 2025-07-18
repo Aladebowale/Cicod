@@ -1,7 +1,7 @@
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Home from "../src/Componenets/Home";
-import "./App.css";
+// import "./App.css";
 import Room1 from "./Componenets/Room1"
 import Room2 from "./Componenets/Room2"
 import Waiting from "./Componenets/Waiting"
@@ -20,6 +20,9 @@ import WebSocketComponent from "./Componenets/AxiosWBs"
 import WebSocketIntegration from "./Componenets/check"
 import EWeb from "./Componenets/Edit"
 
+import Audio from "./Componenets/AudioWebsocket"
+import Video from "./Componenets/VideoWebsocket"
+import ScreenShare from "./Componenets/ScreenShare"
 
 // import WebSocketComponent from "./Componenets/WBs"
 import VWeb from "./Componenets/VWeb"
@@ -31,7 +34,10 @@ const App = () => {
     <div>
        <Router>
         <Routes>
-          <Route path='/' element={<Home/>}/>
+      <Route path="/" element={<Home />} />
+      <Route path={`/Room/:url`} element={<Home />} />
+
+          {/* <Route path='/standupmeet' element={<Home/>}/> */}
           <Route path='/Room1' element={<Room1/>}/> 
           <Route path='/Room2' element={<Room2/>}/>
           <Route path='/Waiting' element={<Waiting/>}/>
@@ -51,7 +57,10 @@ const App = () => {
 
           <Route path='/EWeb' element={<EWeb/>}/>
 
-          {/* <Route path='/VWebinar' element={<VWebinar/>}/> */}
+          <Route path='/Audio' element={<Audio/>}/>
+          <Route path='/Video' element={<Video/>}/>
+          <Route path='/ScreenShare' element={<ScreenShare/>}/>
+
          </Routes>
        </Router> 
 

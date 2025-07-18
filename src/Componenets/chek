@@ -1,0 +1,667 @@
+// import React, { useState, useEffect } from "react";
+// import axios from "axios";
+// import Header from "./Header";
+// import calendar_icon from '../Images/Union.png';
+// import clock_icon from '../Images/Union time.png';
+// import export_icon from '../Images/Export button-icon.png';
+// import contact_icon from '../Images/contact.png';
+// import { useNavigate, useLocation, useParams } from 'react-router-dom';
+
+// const Home = () => {
+//   const navigate = useNavigate();
+//   const location = useLocation();
+//   const { name: meetingNameParam } = useParams();
+//   const [name, setName] = useState('');
+//   const [email, setEmail] = useState('');
+//   const [isValidating, setIsValidating] = useState(true);
+//   const [meetings, setMeetings] = useState([]);
+//   const [selectedMeeting, setSelectedMeeting] = useState(null);
+//   const [error, setError] = useState(null);
+
+//   const standupmeeting = '[StandUp Meeting]';
+//   const standupmeetingRoute = 'standupmeet';
+
+//   const API_URL = 'https://dev.konn3ct.ng/api/app/kv4';
+
+//   useEffect(() => {
+//     const validateMeetingOnLoad = async () => {
+//       try {
+//         const meetingName = meetingNameParam === standupmeetingRoute || location.pathname === `/${standupmeetingRoute}` ? 'standupmeet' : 'default';
+//         const response = await axios.post(`${API_URL}/validate-meeting`, { name: meetingName });
+//         console.log("Meeting Validated:", response.data);
+
+//         const simulatedMeetings = [
+//           { id: "1", time: "8:30am", title: "[Operational Strategy Planning]", date: "Tue Nov 17 2024" },
+//           { id: "2", time: "9:30am", title: "[Streamlining Public Service Delivery]", date: "Tue Nov 17 2024" },
+//           { id: "3", time: "10:30am", title: "[Enhancing Agency Collaboration]", date: "Tue Nov 17 2024" },
+//           { id: "4", time: "11:30am", title: "[Departmental Progress & Future Roadmap Session]", date: "Tue Nov 17 2024" },
+//           { id: "5", time: "12:30pm", title: standupmeeting, date: "Tue Nov 17 2024" },
+//         ];
+//         setMeetings(simulatedMeetings);
+
+//         // Always select StandUp Meeting for / or /standupmeet
+//         const standupMeeting = simulatedMeetings.find(m => m.title === standupmeeting);
+//         if (standupMeeting) {
+//           setSelectedMeeting(standupMeeting);
+//         } else {
+//           setError("StandUp Meeting not found.");
+//         }
+//       } catch (error) {
+//         console.error("Meeting validation failed:", error.response?.data || error.message);
+//         setError("Meeting is unavailable or invalid.");
+//       } finally {
+//         setIsValidating(false);
+//       }
+//     };
+
+//     validateMeetingOnLoad();
+//   }, [location.pathname, meetingNameParam, standupmeetingRoute]);
+
+//   const handleJoinMeeting = async (e) => {
+//     e.preventDefault();
+//     setError(null);
+
+//     try {
+//       const response = await axios.post(`${API_URL}/join-room`, {
+//         name,
+//         email,
+//         meeting: selectedMeeting?.title,
+//       });
+//       console.log("Join Success:", response.data);
+//       navigate(`/Room/${selectedMeeting?.title === standupmeeting ? standupmeetingRoute : 'default'}`, { state: { meeting: selectedMeeting } });
+//     } catch (error) {
+//       console.error("Join Failed:", error.response?.data || error.message);
+//       setError("Invalid name or email. Please try again.");
+//     }
+//   };
+
+//   if (isValidating) {
+//     return (
+//       <div className="h-screen flex justify-center items-center text-lg">
+//         Validating meeting, please wait...
+//       </div>
+//     );
+//   }
+
+//   // Render only StandUp Meeting for /Room/standupmeet
+//   if (meetingNameParam === standupmeetingRoute) {
+//     return (
+//       <div className="min-h-screen bg-gray-100 flex justify-center items-center">
+//         <div className="bg-white rounded-lg shadow-md p-5 w-full max-w-md">
+//           {error && (
+//             <div className="bg-red-100 text-red-700 p-3 rounded-md mb-4 text-sm">
+//               {error}
+//             </div>
+//           )}
+//           {selectedMeeting ? (
+//             <>
+//               <div className="flex justify-between items-center mb-4 text-sm text-gray-600">
+//                 <div className="flex items-center gap-1 text-xs">
+//                   <img src={clock_icon} alt="Clock" width={13} /> {selectedMeeting.time}
+//                 </div>
+//                 <div className="flex items-center gap-1 text-xs">
+//                   <img src={calendar_icon} alt="Calendar" width={13} /> {selectedMeeting.date}
+//                 </div>
+//               </div>
+//               <div className="text-xl font-bold text-gray-800 mb-2">
+//                 <h2>{selectedMeeting.title}</h2>
+//               </div>
+//               <div className="text-sm text-gray-500 mb-5">
+//                 <p>You are in the {standupmeeting} room.</p>
+//               </div>
+//             </>
+//           ) : (
+//             <div className="text-center text-gray-500">Meeting not found</div>
+//           )}
+//         </div>
+//       </div>
+//     );
+//   }
+
+//   // Full UI for other routes
+//   return (
+//     <div className="min-h-screen bg-gray-100">
+//       <Header />
+//       <div className="container mx-auto px-4 py-8 flex flex-col lg:flex-row w-full max-w-4xl justify-center items-center mt-[48px] sm:mt-[56px]">
+//         {/* Sidebar */}
+//         <div className="w-full lg:w-1/4 bg-gray-50 py-4 box-border">
+//           <div className="bg-white border border-green-600 rounded-lg shadow-md p-4 h-[400px] overflow-y-auto">
+//             {meetings.map((item) => (
+//               <div
+//                 key={item.id}
+//                 className={`h-32 mb-2 last:mb-0 bg-white border border-gray-200 rounded-md p-2 cursor-pointer hover:bg-gray-100 ${selectedMeeting?.title === item.title ? 'bg-green-50' : ''}`}
+//                 onClick={() => setSelectedMeeting(item)}
+//               >
+//                 <div className="text-xs text-gray-600 mb-1 mt-1">{item.time}</div>
+//                 <div className="text-sm font-bold text-gray-800 mb-1">{item.title}</div>
+//                 <img src={export_icon} alt="Export" width={13} />
+//               </div>
+//             ))}
+//           </div>
+//         </div>
+
+//         {/* Main Content */}
+//         <div className="w-full lg:w-3/4 mt-4 lg:mt-0 lg:ml-4">
+//           {error && (
+//             <div className="bg-red-100 text-red-700 p-3 rounded-md mb-4 text-sm">
+//               {error}
+//             </div>
+//           )}
+//           {selectedMeeting ? (
+//             <div className="bg-white rounded-lg shadow-md p-5 h-[380px]">
+//               <div className="flex justify-between items-center mb-4 text-sm text-gray-600">
+//                 <div className="flex items-center gap-1 text-xs">
+//                   <img src={clock_icon} alt="Clock" width={13} /> {selectedMeeting.time}
+//                 </div>
+//                 <div className="flex items-center gap-1 text-xs">
+//                   <img src={calendar_icon} alt="Calendar" width={13} /> {selectedMeeting.date}
+//                 </div>
+//               </div>
+//               <div className="text-xl font-bold text-gray-800 mb-2">
+//                 <h2>{selectedMeeting.title}</h2>
+//               </div>
+//               <div className="text-sm text-gray-500 mb-5">
+//                 <p>Enter your name and email to join the meeting.</p>
+//               </div>
+//               <form className="flex flex-col" onSubmit={handleJoinMeeting}>
+//                 <div className="border border-green-500 rounded-md py-1.5 h-10 text-sm flex justify-between items-center gap-2 w-full mb-3">
+//                   <input
+//                     type="text"
+//                     placeholder="Enter your name e.g., Prince Derrick"
+//                     className="flex-grow py-2 border-none rounded-md text-sm outline-none h-8 mt-1 ml-3 w-4/5"
+//                     value={name}
+//                     onChange={(e) => setName(e.target.value)}
+//                     required
+//                   />
+//                   <img height={20} width={20} src={contact_icon} alt="Contact" className="pt-1 w-5" />
+//                 </div>
+//                 <div className="flex items-center mb-4">
+//                   <input type="checkbox" id="save-name" className="mr-2" />
+//                   <label htmlFor="save-name" className="text-xs text-gray-600">
+//                     Save my name for future meetings
+//                   </label>
+//                 </div>
+//                 <div className="flex flex-col sm:flex-row justify-between items-center gap-2 w-full mt-3">
+//                   <input
+//                     type="email"
+//                     placeholder="Enter Email Address"
+//                     className="flex-grow py-2 border border-gray-300 rounded-md text-sm pl-3 mb-2 sm:mb-0"
+//                     value={email}
+//                     onChange={(e) => setEmail(e.target.value)}
+//                     required
+//                   />
+//                   <button
+//                     type="submit"
+//                     className="bg-green-500 text-white border-none py-2 px-4 text-sm rounded-md cursor-pointer transition-colors duration-300 hover:bg-green-600"
+//                   >
+//                     Join Meeting
+//                   </button>
+//                 </div>
+//               </form>
+//               <div className="text-xs mt-4">
+//                 <a href="#more-info" className="text-green-600 no-underline hover:underline">
+//                   Learn more
+//                 </a>{" "}
+//                 about Conference
+//               </div>
+//             </div>
+//           ) : (
+//             <div className="text-center text-gray-500">Select a meeting</div>
+//           )}
+//         </div>
+//       </div>
+//     </div>
+//   );
+// };
+
+// export default Home;
+
+
+
+
+// import React, { useState, useEffect } from "react";
+// import axios from "axios";
+// import Header from "./Header";
+// import calendar_icon from '../Images/Union.png';
+// import clock_icon from '../Images/Union time.png';
+// import export_icon from '../Images/Export button-icon.png';
+// import contact_icon from '../Images/contact.png';
+// import { useNavigate, useLocation, useParams } from 'react-router-dom';
+
+// const Home = () => {
+//   const navigate = useNavigate();
+//   const location = useLocation();
+//   const { name: meetingNameParam } = useParams();
+//   const [name, setName] = useState('');
+//   const [email, setEmail] = useState('');
+//   const [isValidating, setIsValidating] = useState(true);
+//   const [meetings, setMeetings] = useState([]);
+//   const [selectedMeeting, setSelectedMeeting] = useState(null);
+//   const [error, setError] = useState(null);
+//   const [apiResponse, setApiResponse] = useState(null);
+
+//   const standupmeeting = '[StandUp Meeting]';
+//   const standupmeetingRoute = 'standupmeet';
+
+//   const API_URL = 'https://dev.konn3ct.ng/api/app/kv4';
+
+//   useEffect(() => {
+//     const validateMeetingOnLoad = async () => {
+//       try {
+//         const meetingName = meetingNameParam === standupmeetingRoute || location.pathname === `/${standupmeetingRoute}` ? 'standupmeet' : 'default';
+//         const response = await axios.post(`${API_URL}/validate-meeting`, { name: meetingName });
+//         console.log("Meeting Validated:", response.data);
+//         setApiResponse(response.data);
+
+//         const simulatedMeetings = [
+//           { id: "1", time: "8:30am", title: "[Operational Strategy Planning]", date: "Tue Nov 17 2024" },
+//           { id: "2", time: "9:30am", title: "[Streamlining Public Service Delivery]", date: "Tue Nov 17 2024" },
+//           { id: "3", time: "10:30am", title: "[Enhancing Agency Collaboration]", date: "Tue Nov 17 2024" },
+//           { id: "4", time: "11:30am", title: "[Departmental Progress & Future Roadmap Session]", date: "Tue Nov 17 2024" },
+//           { id: "5", time: "12:30pm", title: standupmeeting, date: "Tue Nov 17 2024" },
+//         ];
+//         setMeetings(simulatedMeetings);
+
+//         if (meetingNameParam === standupmeetingRoute || location.pathname === `/${standupmeetingRoute}`) {
+//           const standupMeeting = simulatedMeetings.find(m => m.title === standupmeeting);
+//           if (standupMeeting) {
+//             setSelectedMeeting(standupMeeting);
+//           } else {
+//             setError("StandUp Meeting not found.");
+//           }
+//         } else if (simulatedMeetings.length > 0) {
+//           setSelectedMeeting(simulatedMeetings[0]);
+//         }
+//       } catch (error) {
+//         console.error("Meeting validation failed:", error.response?.data || error.message);
+//         setError("Meeting is unavailable or invalid.");
+//       } finally {
+//         setIsValidating(false);
+//       }
+//     };
+
+//     validateMeetingOnLoad();
+//   }, [location.pathname, meetingNameParam, standupmeetingRoute]);
+
+//   const handleJoinMeeting = async (e) => {
+//     e.preventDefault();
+//     setError(null);
+
+//     try {
+//       const response = await axios.post(`${API_URL}/join-room`, {
+//         name,
+//         email,
+//         meeting: selectedMeeting?.title,
+//       });
+//       console.log("Join Success:", response.data);
+//       navigate(`/Room/${selectedMeeting?.title === standupmeeting ? standupmeetingRoute : 'default'}`, { state: { meeting: selectedMeeting } });
+//     } catch (error) {
+//       console.error("Join Failed:", error.response?.data || error.message);
+//       setError("Invalid name or email. Please try again.");
+//     }
+//   };
+
+//   if (isValidating) {
+//     return (
+//       <div className="h-screen flex justify-center items-center text-lg">
+//         Validating meeting, please wait...
+//       </div>
+//     );
+//   }
+
+//   // Render only StandUp Meeting for /Room/standupmeet
+//   if (meetingNameParam === standupmeetingRoute) {
+//     return (
+//       <div className="min-h-screen bg-gray-100 flex justify-center items-center">
+//         <div className="bg-white rounded-lg shadow-md p-5 w-full max-w-md">
+//           {error && (
+//             <div className="bg-red-100 text-red-700 p-3 rounded-md mb-4 text-sm">
+//               {error}
+//             </div>
+//           )}
+//           {selectedMeeting ? (
+//             <>
+//               <div className="flex justify-between items-center mb-4 text-sm text-gray-600">
+//                 <div className="flex items-center gap-1 text-xs">
+//                   <img src={clock_icon} alt="Clock" width={13} /> {selectedMeeting.time}
+//                 </div>
+//                 <div className="flex items-center gap-1 text-xs">
+//                   <img src={calendar_icon} alt="Calendar" width={13} /> {selectedMeeting.date}
+//                 </div>
+//               </div>
+//               <div className="text-xl font-bold text-gray-800 mb-2">
+//                 <h2>{selectedMeeting.title}</h2>
+//               </div>
+//               <div className="text-sm text-gray-500 mb-5">
+//                 <p>You are in the {standupmeeting} room.</p>
+//               </div>
+//             </>
+//           ) : (
+//             <div className="text-center text-gray-500">Meeting not found</div>
+//           )}
+//         </div>
+//       </div>
+//     );
+//   }
+
+//   // Full UI for other routes
+//   return (
+//     <div className="min-h-screen bg-gray-100">
+//       <Header />
+//       <div className="container mx-auto px-4 py-8 flex flex-col lg:flex-row w-full max-w-4xl justify-center items-center mt-[48px] sm:mt-[56px]">
+//         {/* Sidebar */}
+//         <div className="w-full lg:w-1/4 bg-gray-50 py-4 box-border">
+//           <div className="bg-white border border-green-600 rounded-lg shadow-md p-4 h-[400px] overflow-y-auto">
+//             {meetings.map((item) => (
+//               <div
+//                 key={item.id}
+//                 className={`h-32 mb-2 last:mb-0 bg-white border border-gray-200 rounded-md p-2 cursor-pointer hover:bg-gray-100 ${selectedMeeting?.title === item.title ? 'bg-green-50' : ''}`}
+//                 onClick={() => setSelectedMeeting(item)}
+//               >
+//                 <div className="text-xs text-gray-600 mb-1 mt-1">{item.time}</div>
+//                 <div className="text-sm font-bold text-gray-800 mb-1">{item.title}</div>
+//                 <img src={export_icon} alt="Export" width={13} />
+//               </div>
+//             ))}
+//           </div>
+//         </div>
+
+//         {/* Main Content */}
+//         <div className="w-full lg:w-3/4 mt-4 lg:mt-0 lg:ml-4">
+//           {error && (
+//             <div className="bg-red-100 text-red-700 p-3 rounded-md mb-4 text-sm">
+//               {error}
+//             </div>
+//           )}
+//           {selectedMeeting ? (
+//             <div className="bg-white rounded-lg shadow-md p-5 h-[380px]">
+//               <div className="flex justify-between items-center mb-4 text-sm text-gray-600">
+//                 <div className="flex items-center gap-1 text-xs">
+//                   <img src={clock_icon} alt="Clock" width={13} /> {selectedMeeting.time}
+//                 </div>
+//                 <div className="flex items-center gap-1 text-xs">
+//                   <img src={calendar_icon} alt="Calendar" width={13} /> {selectedMeeting.date}
+//                 </div>
+//               </div>
+//               <div className="text-xl font-bold text-gray-800 mb-2">
+//                 <h2>{selectedMeeting.title}</h2>
+//               </div>
+//               <div className="text-sm text-gray-500 mb-5">
+//                 <p>Enter your name and email to join the meeting.</p>
+//               </div>
+//               <form className="flex flex-col" onSubmit={handleJoinMeeting}>
+//                 <div className="border border-green-500 rounded-md py-1.5 h-10 text-sm flex justify-between items-center gap-2 w-full mb-3">
+//                   <input
+//                     type="text"
+//                     placeholder="Enter your name e.g., Prince Derrick"
+//                     className="flex-grow py-2 border-none rounded-md text-sm outline-none h-8 mt-1 ml-3 w-4/5"
+//                     value={name}
+//                     onChange={(e) => setName(e.target.value)}
+//                     required
+//                   />
+//                   <img height={20} width={20} src={contact_icon} alt="Contact" className="pt-1 w-5" />
+//                 </div>
+//                 <div className="flex items-center mb-4">
+//                   <input type="checkbox" id="save-name" className="mr-2" />
+//                   <label htmlFor="save-name" className="text-xs text-gray-600">
+//                     Save my name for future meetings
+//                   </label>
+//                 </div>
+//                 <div className="flex flex-col sm:flex-row justify-between items-center gap-2 w-full mt-3">
+//                   <input
+//                     type="email"
+//                     placeholder="Enter Email Address"
+//                     className="flex-grow py-2 border border-gray-300 rounded-md text-sm pl-3 mb-2 sm:mb-0"
+//                     value={email}
+//                     onChange={(e) => setEmail(e.target.value)}
+//                     required
+//                   />
+//                   <button
+//                     type="submit"
+//                     className="bg-green-500 text-white border-none py-2 px-4 text-sm rounded-md cursor-pointer transition-colors duration-300 hover:bg-green-600"
+//                   >
+//                     Join Meeting
+//                   </button>
+//                 </div>
+//               </form>
+//               <div className="text-xs mt-4">
+//                 <a href="#more-info" className="text-green-600 no-underline hover:underline">
+//                   Learn more
+//                 </a>{" "}
+//                 about Conference
+//               </div>
+//             </div>
+//           ) : (
+//             <div className="text-center text-gray-500">Select a meeting</div>
+//           )}
+//         </div>
+//       </div>
+//     </div>
+//   );
+// };
+
+// export default Home;
+
+
+// import React, { useState, useEffect } from "react";
+// import axios from "axios";
+// import Header from "./Header";
+// import calendar_icon from '../Images/Union.png';
+// import clock_icon from '../Images/Union time.png';
+// import export_icon from '../Images/Export button-icon.png';
+// import contact_icon from '../Images/contact.png';
+// import { useNavigate, useLocation, useParams } from 'react-router-dom';
+
+// const Home = () => {
+//   const navigate = useNavigate();
+//   const location = useLocation();
+//   const { name: meetingNameParam } = useParams(); 
+//   const [name, setName] = useState('');
+//   const [email, setEmail] = useState('');
+//   const [isValidating, setIsValidating] = useState(true);
+//   const [meetings, setMeetings] = useState([]);
+//   const [selectedMeeting, setSelectedMeeting] = useState(null);
+//   const [error, setError] = useState(null);
+//   const [apiResponse, setApiResponse] = useState(null);
+
+  
+//   const standupmeeting = '[StandUp Meeting]';
+//   const standupmeetingRoute = 'standupmeet';
+
+//   const API_URL = 'https://dev.konn3ct.ng/api/app/kv4';
+
+//   useEffect(() => {
+//     const validateMeetingOnLoad = async () => {
+//       try {
+//         // Use meetingNameParam or fallback to 'standupmeet' for /standupmeet
+//         const meetingName = meetingNameParam === standupmeetingRoute || location.pathname === `/${standupmeetingRoute}` ? 'standupmeet' : 'default';
+//         const response = await axios.post(`${API_URL}/validate-meeting`, { name: meetingName });
+//         console.log("Meeting Validated:", response.data);
+//         setApiResponse(response.data);
+
+//         const simulatedMeetings = [
+//           { id: "1", time: "8:30am", title: "[Operational Strategy Planning]", date: "Tue Nov 17 2024" },
+//           { id: "2", time: "9:30am", title: "[Streamlining Public Service Delivery]", date: "Tue Nov 17 2024" },
+//           { id: "3", time: "10:30am", title: "[Enhancing Agency Collaboration]", date: "Tue Nov 17 2024" },
+//           { id: "4", time: "11:30am", title: "[Departmental Progress & Future Roadmap Session]", date: "Tue Nov 17 2024" },
+//           { id: "5", time: "12:30pm", title: standupmeeting, date: "Tue Nov 17 2024" },
+//         ];
+//         setMeetings(simulatedMeetings);
+
+//         // Auto-select StandUp Meeting for /Room/standupmeet or /standupmeet
+//         if (meetingNameParam === standupmeetingRoute || location.pathname === `/${standupmeetingRoute}`) {
+//           const standupMeeting = simulatedMeetings.find(m => m.title === standupmeeting);
+//           if (standupMeeting) {
+//             setSelectedMeeting(standupMeeting);
+//           } else {
+//             setError("StandUp Meeting not found.");
+//           }
+//         } else if (simulatedMeetings.length > 0) {
+//           setSelectedMeeting(simulatedMeetings[0]);
+//         }
+//       } catch (error) {
+//         console.error("Meeting validation failed:", error.response?.data || error.message);
+//         setError("Meeting is unavailable or invalid.");
+//       } finally {
+//         setIsValidating(false);
+//       }
+//     };
+
+//     validateMeetingOnLoad();
+//   }, [location.pathname, meetingNameParam, standupmeetingRoute]);
+
+//   const handleJoinMeeting = async (e) => {
+//     e.preventDefault();
+//     setError(null);
+
+//     try {
+//       const response = await axios.post(`${API_URL}/join-room`, {
+//         name,
+//         email,
+//         meeting: selectedMeeting?.title,
+//       });
+//       console.log("Join Success:", response.data);
+//       navigate(`/Room/${selectedMeeting?.title === standupmeeting ? standupmeetingRoute : 'default'}`, { state: { meeting: selectedMeeting } });
+//     } catch (error) {
+//       console.error("Join Failed:", error.response?.data || error.message);
+//       setError("Invalid name or email. Please try again.");
+//     }
+//   };
+
+//   const joinStandup = () => {
+//     const standupMeeting = meetings.find(m => m.title === standupmeeting);
+//     if (standupMeeting) {
+//       setSelectedMeeting(standupMeeting);
+//       navigate(`/Room/${standupmeetingRoute}`);
+//     } else {
+//       setError("StandUp Meeting not found.");
+//     }
+//   };
+
+//   if (isValidating) {
+//     return (
+//       <div className="h-screen flex justify-center items-center text-lg">
+//         Validating meeting, please wait...
+//       </div>
+//     );
+//   }
+
+//   return (
+//     <div className="min-h-screen bg-gray-100">
+//       <Header />
+//       <div className="container mx-auto px-4 py-8 flex flex-col lg:flex-row w-full max-w-4xl justify-center items-center mt-[48px] sm:mt-[56px]">
+//         {/* Sidebar */}
+//         <div className="w-full lg:w-1/4 bg-gray-50 py-4 box-border">
+//           <div className="bg-white border border-green-600 rounded-lg shadow-md p-4 h-[400px] overflow-y-auto">
+//             {meetings.map((item, index) => (
+//               <div
+//                 key={item.id}
+//                 className={`h-32 mb-2 last:mb-0 bg-white border border-gray-200 rounded-md p-2 cursor-pointer hover:bg-gray-100 ${selectedMeeting?.title === item.title ? 'bg-green-50' : ''}`}
+//                 onClick={() => setSelectedMeeting(item)}
+//               >
+//                 <div className="text-xs text-gray-600 mb-1 mt-1">{item.time}</div>
+//                 <div className="text-sm font-bold text-gray-800 mb-1">{item.title}</div>
+//                 <img src={export_icon} alt="Export" width={13} />
+//               </div>
+//             ))}
+//           </div>
+//         </div>
+
+//         {/* Main Content */}
+//         <div className="w-full lg:w-3/4 mt-4 lg:mt-0 lg:ml-4">
+//           {error && (
+//             <div className="bg-red-100 text-red-700 p-3 rounded-md mb-4 text-sm">
+//               {error}
+//             </div>
+//           )}
+//           {selectedMeeting ? (
+//             <div className="bg-white rounded-lg shadow-md p-5 h-[380px]">
+//               <div className="flex justify-between items-center mb-4 text-sm text-gray-600">
+//                 <div className="flex items-center gap-1 text-xs">
+//                   <img src={clock_icon} alt="Clock" width={13} /> {selectedMeeting.time}
+//                 </div>
+//                 <div className="flex items-center gap-1 text-xs">
+//                   <img src={calendar_icon} alt="Calendar" width={13} /> {selectedMeeting.date}
+//                 </div>
+//               </div>
+
+//               <div className="text-xl font-bold text-gray-800 mb-2">
+//                 <h2>{selectedMeeting.title}</h2>
+//               </div>
+
+//               {/* Show form only if not on /Room/standupmeet */}
+//               {meetingNameParam !== standupmeetingRoute ? (
+//                 <>
+//                   <div className="text-sm text-gray-500 mb-5">
+//                     <p>Enter your name and email to join the meeting.</p>
+//                   </div>
+//                   <form className="flex flex-col" onSubmit={handleJoinMeeting}>
+//                     <div className="border border-green-500 rounded-md py-1.5 h-10 text-sm flex justify-between items-center gap-2 w-full mb-3">
+//                       <input
+//                         type="text"
+//                         placeholder="Enter your name e.g., Prince Derrick"
+//                         className="flex-grow py-2 border-none rounded-md text-sm outline-none h-8 mt-1 ml-3 w-4/5"
+//                         value={name}
+//                         onChange={(e) => setName(e.target.value)}
+//                         required
+//                       />
+//                       <img height={20} width={20} src={contact_icon} alt="Contact" className="pt-1 w-5" />
+//                     </div>
+
+//                     <div className="flex items-center mb-4">
+//                       <input type="checkbox" id="save-name" className="mr-2" />
+//                       <label htmlFor="save-name" className="text-xs text-gray-600">
+//                         Save my name for future meetings
+//                       </label>
+//                     </div>
+
+//                     <div className="flex flex-col sm:flex-row justify-between items-center gap-2 w-full mt-3">
+//                       <input
+//                         type="email"
+//                         placeholder="Enter Email Address"
+//                         className="flex-grow py-2 border border-gray-300 rounded-md text-sm pl-3 mb-2 sm:mb-0"
+//                         value={email}
+//                         onChange={(e) => setEmail(e.target.value)}
+//                         required
+//                       />
+//                       <button
+//                         type="submit"
+//                         className="bg-green-500 text-white border-none py-2 px-4 text-sm rounded-md cursor-pointer transition-colors duration-300 hover:bg-green-600"
+//                       >
+//                         Join Meeting
+//                       </button>
+//                     </div>
+//                   </form>
+//                 </>
+//               ) : (
+//                 <div className="text-sm text-gray-500 mb-5">
+//                   <p>You are in the {standupmeeting} room. {apiResponse?.message || ''}</p>
+//                 </div>
+//               )}
+
+//               {selectedMeeting.title === standupmeeting && meetingNameParam !== standupmeetingRoute && (
+//                 <button
+//                   onClick={joinStandup}
+//                   className="mt-4 bg-blue-500 text-white border-none py-2 px-4 text-sm rounded-md cursor-pointer transition-colors duration-300 hover:bg-blue-600"
+//                 >
+//                   Join StandUp Meeting
+//                 </button>
+//               )}
+
+//               <div className="text-xs mt-4">
+//                 <a href="#more-info" className="text-green-600 no-underline hover:underline">
+//                   Learn more
+//                 </a>{" "}
+//                 about Conference
+//               </div>
+//             </div>
+//           ) : (
+//             <div className="text-center text-gray-500">Select a meeting</div>
+//           )}
+//         </div>
+//       </div>
+//     </div>
+//   );
+// };
+
+// export default Home;
